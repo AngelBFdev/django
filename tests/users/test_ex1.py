@@ -8,6 +8,18 @@ import pytest
 def test_one():
 	assert 1 == 1
 
+@pytest.mark.parametrize(
+	'val1, val2, result',
+	(
+		(1,2,3),
+		(40,20,60),
+		(10,10,20),
+		(7,83,90)
+	)
+)
+def test_sum(val1,val2,result):
+	assert val1 + val2 == result
+
 @pytest.fixture
 def fixture_per_func():
 	print('run-fixture-per-func')
