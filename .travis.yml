@@ -20,3 +20,4 @@ before_install:
 
 script:
   - docker-compose --env-file .env.stg up -d postgres_db04 && docker-compose --env-file .env.stg up -d web04
+   
