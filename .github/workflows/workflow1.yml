@@ -1,0 +1,39 @@
+name: Deploying docker containers of django and postgres
+
+on:
+    workflow_call:
+    workflow_dispatch:
+    push:
+       branches: [falsa]
+    pull_request:
+        branches: [falsa]
+jobs:
+  simple_build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: main # Checkout with pytest branch
+      - name: List files
+        run: |
+          ls -lsa && tree
+      - name: Create docker network
+        run: |
+          docker network create -d bridge our-library-net
+      - name: Build django image
+        run: |
+          docker build -t my-django-image04:2.0.0 .
+      - name: Run docker container postgres
+        run: |
+          docker-compose --env-file .env.stg up -d postgres_db04
+      - name: Verifying net
+        run: |
+          docker inspect -f "{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}" postgres04
+      # - name: Restoring Database
+      #   run: |
+      #     docker exec postgres04 /bin/bash -c "psql -d angel_bejaranodb -U angel_bejarano < /usr/src/postgres/db_dump.sql"
+      - name: Run docker container web
+        run: |
+          docker-compose --env-file .env.stg up -d web04

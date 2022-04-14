@@ -91,3 +91,22 @@ def test_language_capitalize_name(val1,val2):
   language = Language.objects.create(name=val1)
   print('This is my language name: ', language.name)
   assert language.name != val2
+
+@pytest.mark.django_db
+def test_author_with_monkey(monkeypatch):
+  author = Author.objects.create(name='name',last_name='apellido')
+  
+  class AuthorQuerysetMock():
+    def __init__(self):
+      self.some_value=1
+
+    def count(self):
+      return 4
+
+  def model_count_mock():
+    return AuthorQuerysetMock()
+  
+  monkeypatch.setattr(Author.objects, 'all', model_count_mock)
+
+  assert Author.objects.all().count()==4
+  print('Haciendo el monkeypatch')
